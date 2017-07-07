@@ -1,0 +1,95 @@
+---
+title: "Control width of kable tables with kableExtra"
+author: "JP"
+date: "July 6, 2017"
+output: html_document
+---
+
+Great website on [kableExtra](http://haozhu233.github.io/kableExtra/awesome_table_in_html.html)
+
+```{r global options, include=FALSE}
+knitr::opts_chunk$set(
+  fig.path = 'figs/', fig.show = 'asis', dpi = 300, 
+  include = TRUE, echo = FALSE, 
+  warning = FALSE, message = FALSE, cache = FALSE,
+  knitr.table.format = "html" 
+) 
+
+# Set your knitr table format as a global option for the file
+options(knitr.table.format = "html")
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+`kable` is meant to be very easy to use, but offers few formatting options. That is where `kableExtra` comes in. `kableExtra` offers many practical formatting but can only format that html formatted tables from `kable`.
+You can set `knitr` tables to "html" as a global option (see chunk above) or per each table (see chunk below).
+
+```{r}
+mtcars %>%
+  group_by(cyl) %>%
+  count %>%
+  kable(format = "html", align = "r")
+```
+
+Standard table output in html and github_document is too wide:
+```{r}
+mtcars %>%
+  group_by(cyl) %>% 
+  count %>% 
+  arrange(desc(n)) %>% 
+  kable(align = "r")
+```
+
+Adjsut chunk options helps a little. 
+```{r fig.width=1}
+mtcars %>%
+  group_by(cyl) %>% 
+  count %>% 
+  arrange(desc(n)) %>% 
+  kable(align = "r")
+```
+
+Controlling "style width" in chunk is one option.
+```{r}
+mtcars %>%
+  group_by(cyl) %>% 
+  count %>% 
+  arrange(desc(n)) %>% 
+  kable(align = "r", table.attr = "style='width:15%'")
+```
+
+`kableExtra::kable_styling` is super useful for controlling table width, font size, and many other features.
+```{r}
+mtcars %>%
+  group_by(cyl) %>% 
+  count %>% 
+  arrange(desc(n)) %>% 
+  kable(align = "r") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+    font_size = 14, position = "left") 
+```
+
+### `position = "float_....."` allows you wrap text around your table. 
+```{r}
+mtcars %>%
+  group_by(cyl) %>% 
+  count %>% 
+  arrange(desc(n)) %>% 
+  kable(align = "r") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, 
+    font_size = 14, position = "float_left") 
+```
+For instance lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum. Lorum ipsum et dolorum lorum ipsum et dolorum lorum ipsum et dolorum.
+
+```{r}
+mtcars %>%
+  lm(mpg ~ wt * cyl, .) %>% 
+  summary() %>% 
+  coef() %>% 
+  kable(align = "l", digits = 2) %>% 
+  kable_styling(bootstrap_options = "striped") %>% 
+  add_footnote("You can add a footnote")
+```
+
