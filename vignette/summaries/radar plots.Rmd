@@ -1,0 +1,59 @@
+---
+title: "Radar Plots"
+author: "Joseph Powers"
+date: "10/7/2019"
+output: html_document
+---
+
+```{r}
+# Section: example
+##############################################################################-
+df <- data.frame(Group = LETTERS[1:9],
+                 Yellow = c(-0.61,0.13,0.24,-0.30,-0.12,-1.24,0.74,0.55,0.80),
+                 Blue = c(1.02,-0.40,0.73,0.17,0.68,1.21,-1.35,-0.84,-1.27)
+)
+
+df.m <- reshape2::melt(df, 
+                       id.vars= c("Group"), 
+                       measure.vars= c("Yellow", "Blue"),
+                       variable.name= "Color",
+                       value.name=    "val"
+)
+
+df.m %<>% filter(Color=="Yellow")
+
+# plot
+df.m %>% 
+  ggplot(aes(x=Group, y=val, group= Color, colour=Color, fill=Color)) + 
+  geom_point(size=2) + 
+  geom_polygon(size = 1, alpha= 0.2) + 
+  ylim(-2.0, 2.0) + ggtitle("Radar")  + 
+  scale_x_discrete() +
+  theme_light()+
+  scale_color_manual(values= c("yellow", "blue"))+
+  scale_fill_manual(values= c("yellow", "blue"))+
+  coord_polar()
+
+# plot
+df.m %>% 
+  ggplot(aes(x=Group, y=val, group = 1)) + 
+  geom_point(size=2) + 
+  geom_polygon(size = 1, alpha= 0.2, colour="black", fill="blue") + 
+  ylim(-2.0, 2.0) + ggtitle("Radar")  + 
+  scale_x_discrete() +
+  theme_light()+
+  scale_color_manual(values= c("yellow", "blue"))+
+  scale_fill_manual(values= c("yellow", "blue"))+
+  coord_polar()
+
+# plot
+df.m %>% 
+  ggplot(aes(x=Group, y=val, group = 1)) + 
+  coord_polar() + 
+  geom_point(size=1) + 
+  geom_polygon(size = .5, alpha=.5, colour="black", fill="gray") + 
+  ylim(-2.0, 2.0) + ggtitle("Radar")  + 
+  scale_x_discrete() +
+  theme_light()
+```
+
