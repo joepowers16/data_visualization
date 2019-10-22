@@ -3,11 +3,16 @@ title: "Petr"
 author: "Joseph Powers"
 date: "10/21/2019"
 output:
-  github_document
+  html_document
 ---
 
-```{r, fig.width=6, fig.height=1}
-library(tidyverse)
+```{r}
+suppressPackageStartupMessages(library(breadcrumbs))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(tidyverse))
+source_file_paths()
+
+petr <- read_csv(fs::path(dir_raw, "analysis_rvh.csv")) %>% filter(!near(RvH_Low, -1.00))
 
 df <-
   tibble(
@@ -18,7 +23,8 @@ df <-
 ```
 
 ```{r, fig.width=6, fig.height=1}
-plot_data <- df %>% 
+plot_data <-
+  df %>% 
   mutate(my_range = list(seq(x_min, x_max, by = .1))) %>% 
   unnest(my_range) %>% 
   select(ID, my_range) %>% 
@@ -30,5 +36,34 @@ plot_data <- df %>%
 plot_data %>% 
   ggplot(aes(x = full_range, y = ID), color = "black") + 
   geom_tile(aes(fill = my_range)) 
+```
+
+```{r, fig.width=6, fig.height=1}
+plot_data <- 
+  petr %>% 
+  rowwise() %>% 
+  mutate(my_range = list(seq(RvH_Low, RvH_High, by = .05))) %>% 
+  select(ID = X1, my_range) %>% 
+  unnest() %>% 
+  mutate(full_range = factor(my_range, levels = seq(0, 1, by = .05))) %>% 
+  group_by(ID) %>% 
+  complete(full_range, fill = list(my_range = 0)) %>% 
+  mutate(my_range = ifelse(my_range > 0, TRUE, FALSE)) %>% 
+  ungroup() %>% 
+  group_by(full_range) %>% 
+  summarise(heat = mean(my_range))
+  
+plot_data %>% 
+  ggplot(aes(x = full_range, y = ""), color = "black") + 
+  geom_tile(aes(fill = heat)) + 
+  labs(y = NULL)
+```
+
+If I understand what you're trying to communicate this may be helpful too. 
+```{r}
+plot_data %>% 
+  ggplot(aes(x = full_range, y = heat), color = "black") + 
+  geom_col() + 
+  labs(y = NULL)
 ```
 
